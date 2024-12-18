@@ -152,6 +152,28 @@
         }
       ],
       "total": 19.349999999999998
+    },
+    {
+      "id": "52dd",
+      "entrees": [
+        {
+          "name": "Chicken Fried Lamb Kabob",
+          "price": 14.25
+        }
+      ],
+      "vegetables": [
+        {
+          "type": "Swiss Chard",
+          "price": 2.15
+        }
+      ],
+      "sides": [
+        {
+          "title": "Bacon",
+          "price": 2.95
+        }
+      ],
+      "total": 19.349999999999998
     }
   ]
 }

@@ -35,6 +35,7 @@ const purchaseCombo = async () => {
             transientState.selectedVegetables.length === 0 &&
             transientState.selectedSides.length === 0
         ) {
+            alert("No items selected for purchase")
             throw new Error("No items selected for purchase");
         }
 
@@ -115,86 +116,75 @@ const clearTransientState = () => {
     transientState.selectedSides = [];
 };
 
+// Function to fetch all data
+async function fetchData() {
+    const [entrees, vegetables, sides] = await Promise.all([
+        getEntrees(),
+        getVegetables(),
+        getSides()
+    ]);
+
+    if (!entrees || !vegetables || !sides) {
+        throw new Error("Failed to fetch data from the API");
+    }
+
+    return { entrees, vegetables, sides };
+}
+
+// Function to generate HTML for a category
+function generateCategoryHTML(title, items, itemKey, inputName, inputClass) {
+    return `
+        <div class="column">
+            <h3>${title}</h3>
+            ${items.map(item => `
+                <label>
+                    <input type="radio" name="${inputName}" class="${inputClass}" data-id="${item.id}">
+                    ${item[itemKey]} - $${item.price.toFixed(2)}
+                </label>
+            `).join("")}
+        </div>
+    `;
+}
+
+// Function to attach event listeners for a category
+function attachRadioEventListeners(className, items, category) {
+    document.querySelectorAll(`.${className}`).forEach(radio => {
+        radio.addEventListener("change", event => {
+            const id = parseInt(event.target.dataset.id, 10);
+            const item = items.find(item => parseInt(item.id) === id);
+            toggleSelection(category, item);
+        });
+    });
+}
+
+// Function to handle the purchase button setup
+function setupPurchaseButton() {
+    const purchaseButton = document.getElementById("purchase");
+    if (purchaseButton) {
+        purchaseButton.addEventListener("click", async () => {
+            await purchaseCombo();
+        });
+    }
+}
+
+// Main function to render the sales HTML and attach event listeners
 export default async function Sales() {
     try {
-        const [entrees, vegetables, sides] = await Promise.all([
-            getEntrees(),
-            getVegetables(),
-            getSides()
-        ]);
+        const { entrees, vegetables, sides } = await fetchData();
 
-        if (!entrees || !vegetables || !sides) {
-            throw new Error("Failed to fetch data from the API");
-        }
-
-        // Generate the HTML for the food options
+        // Generate the sales HTML
         const salesHTML = `
-            <div class="column">
-                <h3>Entrees</h3>
-                ${entrees.map((entree, index) => `
-                    <label>
-                        <input type="radio" name="entree" class="entree-radio" data-id="${entree.id}">
-                        ${entree.name} - $${entree.price.toFixed(2)}
-                    </label>
-
-                `).join("")}
-            </div>
-            <div class="column">
-                <h3>Vegetables</h3>
-                ${vegetables.map((veg, index) => `
-                    <label>
-                        <input type="radio" name="vegetable" class="vegetable-radio" data-id="${veg.id}">
-                        ${veg.type} - $${veg.price.toFixed(2)}
-                    </label>
-                `).join("")}
-            </div>
-            <div class="column">
-                <h3>Sides</h3>
-                ${sides.map((side, index) => `
-                    <label>
-                        <input type="radio" name="side" class="side-radio" data-id="${side.id}">
-                        ${side.title} - $${side.price.toFixed(2)}
-                    </label>
-                `).join("")}
-            </div>
+            ${generateCategoryHTML("Entrees", entrees, "name", "entree", "entree-radio")}
+            ${generateCategoryHTML("Vegetables", vegetables, "type", "vegetable", "vegetable-radio")}
+            ${generateCategoryHTML("Sides", sides, "title", "side", "side-radio")}
         `;
 
-        // Add event listeners after the HTML is inserted
+        // Attach event listeners
         setTimeout(() => {
-            // Attach listeners to entree radio buttons
-            document.querySelectorAll(".entree-radio").forEach(radio => {
-                radio.addEventListener("change", event => {
-                    const id = parseInt(event.target.dataset.id, 10);
-                    const item = entrees.find(entree => parseInt(entree.id) === id);
-                    toggleSelection("Entrees", item);
-                });
-            });
-
-            // Attach listeners to vegetable radio buttons
-            document.querySelectorAll(".vegetable-radio").forEach(radio => {
-                radio.addEventListener("change", event => {
-                    const id = parseInt(event.target.dataset.id, 10);
-                    const item = vegetables.find(veg => parseInt(veg.id) === id);
-                    toggleSelection("Vegetables", item);
-                });
-            });
-
-            // Attach listeners to side radio buttons
-            document.querySelectorAll(".side-radio").forEach(radio => {
-                radio.addEventListener("change", event => {
-                    const id = parseInt(event.target.dataset.id, 10);
-                    const item = sides.find(side => parseInt(side.id) === id);
-                    toggleSelection("Sides", item);
-                });
-            });
-
-            // Set up the purchase button
-            const purchaseButton = document.getElementById("purchase");
-            if (purchaseButton) {
-                purchaseButton.addEventListener("click", async () => {
-                    await purchaseCombo();
-                });
-            }
+            attachRadioEventListeners("entree-radio", entrees, "Entrees");
+            attachRadioEventListeners("vegetable-radio", vegetables, "Vegetables");
+            attachRadioEventListeners("side-radio", sides, "Sides");
+            setupPurchaseButton();
         }, 0);
 
         return salesHTML;
@@ -203,4 +193,3 @@ export default async function Sales() {
         return `<div class="error">Failed to load data. Please try again later.</div>`;
     }
 }
-
