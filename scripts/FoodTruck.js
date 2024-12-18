@@ -1,7 +1,8 @@
-import { Sales } from "./Sales.js"
+import Sales from "./Sales.js";
 
-export const FoodTruck = () => {
-    const salesHTML = Sales()
+
+export const FoodTruck = async () => {
+    const salesHTML = await Sales();
 
     return `
         <header class="header">
@@ -11,12 +12,18 @@ export const FoodTruck = () => {
 
         <article>
             <button id="purchase">Purchase Combo</button>
+            ${salesHTML}
         </article>
 
         <article class="customerOrders">
             <h2>Monthly Sales</h2>
-            ${salesHTML}
+            
         </article>
+    `;
+};
 
-    `
-}
+// Mount event listener to dynamically update purchases
+document.addEventListener("DOMContentLoaded", async () => {
+    const mainElement = document.querySelector("main");
+    mainElement.innerHTML = await FoodTruck();
+});
