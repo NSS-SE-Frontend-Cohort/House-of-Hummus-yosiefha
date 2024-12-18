@@ -56,10 +56,24 @@ sequenceDiagram
 > 🧨 Before you click the "Assessment Complete" button on the Learning Platform, add your answers below for each question and make a commit. It is your option to request a face-to-face meeting with a coach for a vocabulary review.
 
 1. Should transient state be represented in a database diagram? Why, or why not?
-   > Your answer here
+   > No it does not need to be represented because it is a temporary data used only during application runtime. This data exists only during the session and is typically cleared after the transaction is completed or the application is closed.
 2. In the **FoodTruck** module, you are **await**ing the invocataion of all of the component functions _(e.g. sales, veggie options, etc.)_. Why must you use the `await` keyword there? Explain what happens if you remove it.
-   > Your answer here
+   > the await keyword is necessary because it ensures that the component functions  complete their asynchronous operations and return their resolved values before proceeding further in the code execution.
+
+   Without await, the Promise returned by the functions will not be resolved immediately, and any dependent logic might execute with incomplete or undefined data. This can lead to bugs, such as attempting to render incomplete UI or process unavailable data.
+
 3. When the user is making choices by selecting radio buttons, explain how that data is retained so that the **Purchase Combo** button works correctly.
-   > Your answer here
+   > When a user selects a radio button, an event listener attached to the radio button detects the change.
+   When a radio button is selected, the transient state is updated to reflect the user's choice.
+
+   When the Purchase Combo button is clicked, the transient state is used to build the requestBody for the purchase ensuring the user's current selections (stored in the transient state) are included in the API request when the purchase is made.
+
+   Radio buttons inherently allow only one selection per category (e.g., one entree, one vegetable, one side). This simplifies the transient state management because you only need to replace the existing selection with the newly selected item.
+
 4. You used the `map()` array method in the self assessment _(at least, you should have since it is a learning objective)_. Explain why that function is helpful as a replacement for a `for..of` loop.
-   > Your answer here
+   > map() is used over for ..of when ever data transformation is needed, code becomes cleaner, more expressive, and easier to maintain.
+
+   map() allows you to directly transform or extract data from an array in a single, clear line of code. while for..of loop requires more boilerplate to achieve the same result.
+    
+    map() inherently returns a new array of the same length as the original array, containing the transformed elements. while in for..of,  we would need to manage the array creation and manual population.
+
